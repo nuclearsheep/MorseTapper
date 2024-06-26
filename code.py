@@ -22,6 +22,7 @@ silence = 0
 
 UNIT_TIME = 120  # Time in mill's for a 'dit'
 letters = {
+    # Letters
     ".-": "A",
     "-...": "B",
     "-.-.": "C",
@@ -48,6 +49,7 @@ letters = {
     "-..-": "X",
     "-.--": "Y",
     "--..": "Z",
+    # Numbers
     ".----": "1",
     "..---": "2",
     "...--": "3",
@@ -58,21 +60,57 @@ letters = {
     "---..": "8",
     "----.": "9",
     "-----": "0",
-    ".-.-.-": ".",
-    "--..--": ",",
-    "---...": ":",
-    "..--..": "?",
-    ".----.": "'",
-    "-....-": "-",
-    "-..-.": "/",
-    "-.--.": "(",
-    "-.--.-": ")",
-    ".-..-.": "\"",
-    "-...-": "=" }
+    # Math
+    "-...-": "=",
+    "-.--.": "+",
+    "-.---": "-",
+    ".-.--": "*",
+    ".-..-": "/",
+    "--.--": "\\",
+    "---.-": "|",
+    ".--..": "(",
+    ".--.-": ")",
+    "--.-.": "{",
+    "--..-": "}",
+    "-..-.": "[",
+    "-..--": "]",
+	# Punctuation
+	".-.-.-": ".",
+	"--..--": ",",
+	"---...": ":",
+	"..-.-": ";",
+	"..--..": "?",
+	"..--.": "!",
+	".-..-.": '"',
+	".----.": "'",
+	# Arrows
+	"..-..": "UP",
+	".-.-.": "DOWN",
+	".-...": "LEFT",
+	"...-.": "RIGHT",
+	# Functions
+	"-.....": "COPY",
+	".-....": "CUT",
+	"..-...": "PASTE",
+	"...-..": "UNDO",
+	".....-": "SAVE",
+	".-.-": Keycode.ESCAPE,
+	"---.": " ",
+	"----": "\b",  # BACK
+	".---.": Keycode.ENTER,
+	"....--": Keycode.DELETE,
+	"..--": Keycode.SHIFT,
+	"-.-..": Keycode.CONTROL,
+	"-.-.-": Keycode.ALT,
+	}
+
 
 def emitLetter(string):
     try:
         keyboard_layout.write(letters[string])
+# keyboard_layout.write may be redundant if we'll use keycodes...
+# keyboard.press(Keycode.<key>) may be preferred assuming we can
+# install it into a dictionary. But remember you must release too.
     except:
         pass
 
@@ -85,19 +123,17 @@ while True:
 
     if (A1.value):  # Button is released
         if (prevstate ^ A1.value):  # Transition; reset and tally to dits
-            print(silence)
-            silence = 0
             if signal < (UNIT_TIME*2):  # Tally signal to ternary
                 dits += "."
             else:
                 dits += "-"
-            #print(dits)
+            silence = 0
         else:  # Space => Record
             silence += 1
             if (silence < UNIT_TIME*2):
                 pass
             elif (silence < (UNIT_TIME*6)):
-                if dits != "":  # If anything is recorded, check against Letters, then reset it.
+                if dits != "":  # Check dictionary
                     emitLetter(dits)  # <== See Below
                     dits = ""
             else:  # Timeout
@@ -105,10 +141,8 @@ while True:
                 dits = ""
     else:  # Button is pressed
         if (prevstate ^ A1.value):  # Transition
-            print(signal)
             signal = 0
         else:  # Space
             signal += 1
-    #print(dits)
     prevstate = A1.value
     time.sleep(0.001)
