@@ -127,12 +127,6 @@ def emitLetter(code):
             toglist[code] ^= 1
 
 while True:
-    # Start/stop timers depending on up or down
-    # There will be no more than two transition points by defintion
-    # Spaces determine which timer
-    # When time comes to count a space, erase the previous reading
-    # first before recording
-
     if (A1.value):  # Button is released
         if (prevstate ^ A1.value):  # Transition; reset and tally to dits
             if signal < (UNIT_TIME*2):  # Tally signal to ternary
